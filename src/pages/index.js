@@ -1,0 +1,1 @@
+export { default as MaterialEntryPage } from './MaterialsEntryPage/MaterialsEntryPage'

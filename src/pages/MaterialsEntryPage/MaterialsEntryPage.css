@@ -1,0 +1,98 @@
+/* General Container */
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+  }
+  
+  .form-wrapper {
+    background-color: white;
+    width: 600px;
+    border: 1px solid #ccc; /* Generic border */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+  
+  /* Header */
+  .header {
+    background-color: #f3dffb; /* Light purple from image */
+    padding: 15px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .header h2 {
+    margin: 0;
+    font-size: 18px;
+    color: #000;
+    font-weight: bold;
+  }
+  
+  /* Form Layout */
+  form {
+    padding: 30px 50px;
+  }
+  
+  .form-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+  
+  .form-group label {
+    width: 40%;
+    font-weight: 500;
+    color: #333;
+  }
+  
+  .form-group input,
+  .form-group select {
+    width: 55%;
+    padding: 8px;
+    border: 1px solid #7e57c2; /* Purple border for inputs */
+    border-radius: 2px;
+    font-size: 14px;
+  }
+  
+  /* Specific styling for inputs to match the "box" look */
+  .form-group input:focus,
+  .form-group select:focus {
+    outline: none;
+    border-color: #5e35b1;
+    box-shadow: 0 0 3px rgba(94, 53, 177, 0.3);
+  }
+  
+  /* Submit Button */
+  .form-actions {
+    display: flex;
+    justify-content: flex-start; /* Image shows button aligned near left/center */
+    margin-top: 20px;
+  }
+  
+  .submit-btn {
+    background-color: #f3dffb;
+    border: 1px solid #7e57c2;
+    color: #000;
+    padding: 8px 30px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  
+  .submit-btn:hover {
+    background-color: #e1bee7;
+  }
+  
+  /* Footer Note */
+  .footer-note {
+    padding: 0 50px 20px 50px;
+    font-size: 14px;
+    color: #000;
+  }
+  
+  .footer-note i {
+    font-style: italic;
+  }
