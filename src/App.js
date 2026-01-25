@@ -4,9 +4,7 @@ import { MaterialEntryPage } from './pages'
 
 function App() {
   return (
-    <div className="App">
-      hello
-      {/* <PostForm></PostForm> */}
+    <div className="App"> 
       <MaterialEntryPage/>
     </div>
   );
