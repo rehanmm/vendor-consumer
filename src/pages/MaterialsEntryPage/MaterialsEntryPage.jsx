@@ -116,7 +116,6 @@ const MaterialsEntryPage = () => {
     // FIX: Clean up payload creation
     const payload = { 
         ...formData, 
-        purchaseId: newId,
         balance: formData.purchaseAmount // Assuming balance = purchaseAmount initially
     };
     
