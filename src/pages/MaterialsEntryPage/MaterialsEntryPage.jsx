@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; // <--- 1. Import useNavigate
 import './MaterialsEntryPage.css'; 
 import { dummyCategories, dummyTypes, dummyVendors, dummyUnits } from '../../dummyData/MaterialPageDummy';
-// Import the service
 import { fetchAllMaterialFormData } from '../../services/MaterialService';
 
-// ==========================================
-// 1. CONFIGURATION: TOGGLE DATA SOURCE HERE
-// ==========================================
-const USE_DUMMY_DATA = true; // Set to FALSE to use real API calls
-// ==========================================
+const USE_DUMMY_DATA = true;
 
 const MaterialsEntryPage = () => {
+  const navigate = useNavigate(); // <--- 2. Initialize Hook
+
   // --- State for Form Fields ---
   const [formData, setFormData] = useState({
     vendorName: '',
@@ -35,71 +33,44 @@ const MaterialsEntryPage = () => {
 
   const [error, setError] = useState(null);
 
-  // --- EFFECT: Fetch Data (Dummy or Real) ---
+  // --- EFFECT: Fetch Data ---
   useEffect(() => {
     const loadData = async () => {
       setError(null);
-
       if (USE_DUMMY_DATA) {
-        console.log("Loading Dummy Data...");
         setVendorOptions(dummyVendors);
-        setMaterialData({
-          categories: dummyCategories,
-          types: dummyTypes,
-          units: dummyUnits
-        });
+        setMaterialData({ categories: dummyCategories, types: dummyTypes, units: dummyUnits });
       } else {
-        console.log("Attempting API Calls...");
         try {
-          // Use the service to fetch everything in parallel
           const data = await fetchAllMaterialFormData();
-          
           setVendorOptions(data.vendors);
-          setMaterialData({
-            categories: data.categories,
-            types: data.types,
-            units: data.units
-          });
+          setMaterialData({ categories: data.categories, types: data.types, units: data.units });
         } catch (err) {
-          setError("API Connection Failed. Using Dummy Data as fallback.");
-          // Fallback mechanism (optional)
+          setError("API Connection Failed. Using Dummy Data.");
           setVendorOptions(dummyVendors);
-          setMaterialData({
-             categories: dummyCategories,
-             types: dummyTypes,
-             units: dummyUnits
-          });
+          setMaterialData({ categories: dummyCategories, types: dummyTypes, units: dummyUnits });
         }
       }
     };
-
     loadData();
   }, []);
 
   // --- Handlers ---
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const generatePurchaseId = () => {
-    // Logic: P_{VendorId}_{Date}_{CategoryId}_1
-    
-    // 1. Get Vendor ID safely
     const selectedVendor = vendorOptions.find(v => v.vendorName === formData.vendorName);
     const vCode = selectedVendor ? selectedVendor.vendorId : 'UNK';
-
-    // 2. Format Date
+    
     let dateStr = '00000000';
     if(formData.purchaseDate) {
       const [year, month, day] = formData.purchaseDate.split('-');
       dateStr = `${month}${day}${year}`; 
     }
 
-    // 3. Get Category ID safely
     const selectedCat = materialData.categories.find(c => c.categoryName === formData.materialCategory);
     const cCode = selectedCat ? selectedCat.categoryId : 'XXX';
 
@@ -111,14 +82,20 @@ const MaterialsEntryPage = () => {
     const newId = generatePurchaseId();
     setGeneratedId(newId);
     
-    // Create the final payload object
     const payload = { ...formData, purchaseId: newId };
-    
     console.log("Submitting Payload:", payload);
-    alert(`Form Submitted!\nGenerated Purchase ID: ${newId}`);
-    
-    // Here you would typically call another service function to POST the data:
-    // await saveMaterialEntry(payload);
+
+    alert("Form Submitted! Redirecting to Report...");
+
+    // <--- 3. NAVIGATE TO REPORT PAGE WITH DATA --->
+    // We pass the vendorName and use the purchaseDate for both 'from' and 'to'
+    navigate('/vendorReport', { 
+      state: { 
+        vendorName: formData.vendorName,
+        fromDate: formData.purchaseDate,
+        toDate: formData.purchaseDate // Setting range to the specific purchase date
+      } 
+    });
   };
 
   return (
@@ -134,12 +111,7 @@ const MaterialsEntryPage = () => {
           {/* Vendor Name */}
           <div className="form-group">
             <label>Vendor Name</label>
-            <select 
-              name="vendorName" 
-              value={formData.vendorName} 
-              onChange={handleChange}
-              required
-            >
+            <select name="vendorName" value={formData.vendorName} onChange={handleChange} required>
               <option value="">-- Select Vendor --</option>
               {vendorOptions.map((v) => (
                 <option key={v.vendorId} value={v.vendorName}>{v.vendorName}</option>
@@ -150,12 +122,7 @@ const MaterialsEntryPage = () => {
           {/* Material Category */}
           <div className="form-group">
             <label>Material Category</label>
-            <select 
-              name="materialCategory" 
-              value={formData.materialCategory} 
-              onChange={handleChange}
-              required
-            >
+            <select name="materialCategory" value={formData.materialCategory} onChange={handleChange} required>
               <option value="">-- Select Category --</option>
               {materialData.categories.map((c) => (
                 <option key={c.categoryId} value={c.categoryName}>{c.categoryName}</option>
@@ -166,11 +133,7 @@ const MaterialsEntryPage = () => {
           {/* Material Type */}
           <div className="form-group">
             <label>Material Type</label>
-            <select 
-              name="materialType" 
-              value={formData.materialType} 
-              onChange={handleChange}
-            >
+            <select name="materialType" value={formData.materialType} onChange={handleChange}>
               <option value="">-- Select Type --</option>
               {materialData.types.map((t) => (
                 <option key={t.typeId} value={t.typeName}>{t.typeName}</option>
@@ -181,11 +144,7 @@ const MaterialsEntryPage = () => {
           {/* Unit */}
           <div className="form-group">
             <label>Unit</label>
-            <select 
-              name="unit" 
-              value={formData.unit} 
-              onChange={handleChange}
-            >
+            <select name="unit" value={formData.unit} onChange={handleChange}>
               <option value="">-- Select Unit --</option>
               {materialData.units.map((u) => (
                 <option key={u.unitId} value={u.unitName}>{u.unitName}</option>
@@ -196,59 +155,34 @@ const MaterialsEntryPage = () => {
           {/* Brand Name */}
           <div className="form-group">
             <label>Brand Name</label>
-            <input 
-              type="text" 
-              name="brandName" 
-              value={formData.brandName} 
-              onChange={handleChange} 
-              placeholder="e.g. Raymonds"
-            />
+            <input type="text" name="brandName" value={formData.brandName} onChange={handleChange} placeholder="e.g. Raymonds"/>
           </div>
 
           {/* Quantity */}
           <div className="form-group">
             <label>Quantity</label>
-            <input 
-              type="number" 
-              name="quantity" 
-              value={formData.quantity} 
-              onChange={handleChange} 
-            />
+            <input type="number" name="quantity" value={formData.quantity} onChange={handleChange} />
           </div>
 
           {/* Purchase Amount */}
           <div className="form-group">
             <label>Purchase Amount</label>
-            <input 
-              type="number" 
-              name="purchaseAmount" 
-              value={formData.purchaseAmount} 
-              onChange={handleChange} 
-            />
+            <input type="number" name="purchaseAmount" value={formData.purchaseAmount} onChange={handleChange} />
           </div>
 
           {/* Purchase Date */}
           <div className="form-group">
             <label>Purchase Date</label>
-            <input 
-              type="date" 
-              name="purchaseDate" 
-              value={formData.purchaseDate} 
-              onChange={handleChange} 
-            />
+            <input type="date" name="purchaseDate" value={formData.purchaseDate} onChange={handleChange} required />
           </div>
 
-          {/* Submit Action */}
           <div className="form-actions">
-            <button type="submit" className="submit-btn">Submit</button>
+            <button type="submit" className="submit-btn">Submit & View Report</button>
           </div>
         </form>
 
         <div className="footer-note">
-          <p>
-            Note: <i>Purchase Id is generated on submit Ex: 
-            {generatedId ? <strong> {generatedId}</strong> : " P_V001_07052018_C001_1"}</i>
-          </p>
+           <p>Note: <i>Purchase Id is generated on submit</i></p>
         </div>
       </div>
     </div>
