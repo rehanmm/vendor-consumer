@@ -2,25 +2,54 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom'; // <--- 1. Import useNavigate
 import './MaterialsEntryPage.css'; 
 import { dummyCategories, dummyTypes, dummyVendors, dummyUnits } from '../../dummyData/MaterialPageDummy';
-import { fetchAllMaterialFormData } from '../../services/MaterialService';
+import { fetchAllMaterialFormData,savePurchaseEntry } from '../../services/MaterialService';
 
-const USE_DUMMY_DATA = true;
+const USE_DUMMY_DATA = false;
 
 const MaterialsEntryPage = () => {
   const navigate = useNavigate(); // <--- 2. Initialize Hook
 
   // --- State for Form Fields ---
+  // const [formData, setFormData] = useState({
+  //   vendorName: '',
+  //   materialCategory: '',
+  //   materialType: '',
+  //   unit: '',
+  //   brandName: '',
+  //   quantity: '',
+  //   purchaseAmount: '',
+  //   purchaseDate: ''
+  // });
   const [formData, setFormData] = useState({
     vendorName: '',
-    materialCategory: '',
-    materialType: '',
-    unit: '',
+    materialCategoryId:'',
+    materialTypeId:'',
     brandName: '',
+    unitId:'',
     quantity: '',
     purchaseAmount: '',
-    purchaseDate: ''
+    purchaseDate: '',
+    materialCategoryName: '',
+    materialTypeName: '',
+    MaterialUnitName: '',
   });
-
+/*
+private long purchaseId;
+  private String transactionId;
+  private String vendorName;
+  private String materialCategoryId;
+  private String materialTypeId;
+  private String brandName;
+  private String unitId;
+  private Integer quantity;
+  private Double purchaseAmount;
+  private Double balance;
+  private Date purchaseDate;
+  private String materialCategoryName;
+  private String materialTypeName;
+  private String materialUnitName;
+  private String status;
+*/
   const [generatedId, setGeneratedId] = useState('');
 
   // --- State for Data (Dropdowns) ---
@@ -43,6 +72,7 @@ const MaterialsEntryPage = () => {
       } else {
         try {
           const data = await fetchAllMaterialFormData();
+          console.log(data);
           setVendorOptions(data.vendors);
           setMaterialData({ categories: data.categories, types: data.types, units: data.units });
         } catch (err) {
@@ -84,7 +114,10 @@ const MaterialsEntryPage = () => {
     
     const payload = { ...formData, purchaseId: newId };
     console.log("Submitting Payload:", payload);
-
+       savePurchaseEntry(payload)
+      .then(console.log)
+      .catch(console.error);
+        alert(`Success! Entry saved with ID: ${newId}`);
     alert("Form Submitted! Redirecting to Report...");
 
     // <--- 3. NAVIGATE TO REPORT PAGE WITH DATA --->
@@ -122,7 +155,7 @@ const MaterialsEntryPage = () => {
           {/* Material Category */}
           <div className="form-group">
             <label>Material Category</label>
-            <select name="materialCategory" value={formData.materialCategory} onChange={handleChange} required>
+            <select name="materialCategoryName" value={formData.materialCategoryName} onChange={handleChange} required>
               <option value="">-- Select Category --</option>
               {materialData.categories.map((c) => (
                 <option key={c.categoryId} value={c.categoryName}>{c.categoryName}</option>
@@ -133,7 +166,7 @@ const MaterialsEntryPage = () => {
           {/* Material Type */}
           <div className="form-group">
             <label>Material Type</label>
-            <select name="materialType" value={formData.materialType} onChange={handleChange}>
+            <select name="materialTypeName" value={formData.materialTypeName} onChange={handleChange}>
               <option value="">-- Select Type --</option>
               {materialData.types.map((t) => (
                 <option key={t.typeId} value={t.typeName}>{t.typeName}</option>
@@ -144,7 +177,7 @@ const MaterialsEntryPage = () => {
           {/* Unit */}
           <div className="form-group">
             <label>Unit</label>
-            <select name="unit" value={formData.unit} onChange={handleChange}>
+            <select name="MaterialUnitName" value={formData.MaterialUnitName} onChange={handleChange}>
               <option value="">-- Select Unit --</option>
               {materialData.units.map((u) => (
                 <option key={u.unitId} value={u.unitName}>{u.unitName}</option>

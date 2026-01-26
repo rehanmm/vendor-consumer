@@ -1,14 +1,45 @@
 // services/MaterialService.js
 
 // Based on your code, Vendors are on port 8088, others on 8087
-const VENDOR_API_BASE = "http://localhost:8088/vendor/controller";
-const INVENTORY_API_BASE = "http://localhost:8087"; 
+const VENDOR_API_BASE = "http://localhost:8080/inventorymanagementsystem";
+const INVENTORY_API_BASE = "http://localhost:8080/inventorymanagementsystem"; 
 
 /**
  * Generic helper to fetch JSON data
  */
+
+
+export const savePurchaseEntry = async (payload) => {
+  // REPLACE with your actual save endpoint
+  const url = `${INVENTORY_API_BASE}/postPurchaseEntry`; 
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Save Failed: ${response.status} ${response.statusText}`);
+    }
+
+    // Return response text or json depending on what your backend sends back
+    return await response.text(); 
+
+  } catch (error) {
+    console.error("Error saving purchase:", error);
+    throw error;
+  }
+};
+
+
+
 const fetchJson = async (url) => {
   const response = await fetch(url);
+  console.log(response);
   if (!response.ok) {
     throw new Error(`Failed to fetch ${url}: ${response.statusText}`);
   }
@@ -20,15 +51,15 @@ export const getVendors = () => {
 };
 
 export const getCategories = () => {
-  return fetchJson(`${INVENTORY_API_BASE}/material/controller/getCategoryDetails`);
+  return fetchJson(`${INVENTORY_API_BASE}/getMaterialCategories`);
 };
 
 export const getTypes = () => {
-  return fetchJson(`${INVENTORY_API_BASE}/type/controller/getTypeDetails`);
+  return fetchJson(`${INVENTORY_API_BASE}/getMaterialTypes`);
 };
 
 export const getUnits = () => {
-  return fetchJson(`${INVENTORY_API_BASE}/unit/controller/getUnitDetails`);
+  return fetchJson(`${INVENTORY_API_BASE}/getUnitDetails`);
 };
 
 /**
