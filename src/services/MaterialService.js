@@ -1,9 +1,7 @@
 // services/MaterialService.js
 
 // Based on your code, Vendors are on port 8088, others on 8087
-const VENDOR_API_BASE = "http://localhost:8080/inventorymanagementsystem";
-const INVENTORY_API_BASE = "http://localhost:8080/inventorymanagementsystem"; 
-
+const BASE_URL = process.env.BASE_URL;
 /**
  * Generic helper to fetch JSON data
  */
@@ -11,7 +9,7 @@ const INVENTORY_API_BASE = "http://localhost:8080/inventorymanagementsystem";
 
 export const savePurchaseEntry = async (payload) => {
   // REPLACE with your actual save endpoint
-  const url = `${INVENTORY_API_BASE}/postPurchaseEntry`; 
+  const url = `${BASE_URL}/postPurchaseEntry`; 
 
   try {
     const response = await fetch(url, {
@@ -47,19 +45,19 @@ const fetchJson = async (url) => {
 };
 
 export const getVendors = () => {
-  return fetchJson(`${VENDOR_API_BASE}/getVendors`);
+  return fetchJson(`${BASE_URL}/getVendors`);
 };
 
 export const getCategories = () => {
-  return fetchJson(`${INVENTORY_API_BASE}/getMaterialCategories`);
+  return fetchJson(`${BASE_URL}/getMaterialCategories`);
 };
 
 export const getTypes = () => {
-  return fetchJson(`${INVENTORY_API_BASE}/getMaterialTypes`);
+  return fetchJson(`${BASE_URL}/getMaterialTypes`);
 };
 
 export const getUnits = () => {
-  return fetchJson(`${INVENTORY_API_BASE}/getUnitDetails`);
+  return fetchJson(`${BASE_URL}/getUnitDetails`);
 };
 
 /**

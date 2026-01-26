@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom'; // <--- 1. Import useLocation
 import './VendorReportPage.css';
-import DummyVendorPage from '../../dummyData/VendorPageDummy';
 import { fetchVendorReportData } from '../../services/VendorService'; 
 
 const VendorReportPage = () => {
@@ -14,7 +13,7 @@ const VendorReportPage = () => {
     toDate: '2018-07-08'
   });
 
-  const [reportData, setReportData] = useState(DummyVendorPage);
+  const [reportData, setReportData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -44,8 +43,7 @@ const VendorReportPage = () => {
         setReportData([]); 
       }
     } catch (err) {
-      setError("Failed to fetch data from server. Displaying Dummy Data.");
-      setReportData(DummyVendorPage); 
+      setError("Failed to fetch data from server.",err);
     } finally {
       setIsLoading(false);
     }

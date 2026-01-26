@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './MaterialsEntryPage.css'; 
-import { dummyCategories, dummyTypes, dummyVendors, dummyUnits } from '../../dummyData/MaterialPageDummy';
 import { fetchAllMaterialFormData, savePurchaseEntry } from '../../services/MaterialService';
 
-const USE_DUMMY_DATA = false;
 
 const MaterialsEntryPage = () => {
   const navigate = useNavigate();
@@ -40,10 +38,6 @@ const MaterialsEntryPage = () => {
   useEffect(() => {
     const loadData = async () => {
       setError(null);
-      if (USE_DUMMY_DATA) {
-        setVendorOptions(dummyVendors);
-        setMaterialData({ categories: dummyCategories, types: dummyTypes, units: dummyUnits });
-      } else {
         try {
           const data = await fetchAllMaterialFormData();
           // FIX: Removed direct state mutation (formData.unitId = ...). 
@@ -51,11 +45,9 @@ const MaterialsEntryPage = () => {
           setVendorOptions(data.vendors);
           setMaterialData({ categories: data.categories, types: data.types, units: data.units });
         } catch (err) {
-          setError("API Connection Failed. Using Dummy Data.");
-          setVendorOptions(dummyVendors);
-          setMaterialData({ categories: dummyCategories, types: dummyTypes, units: dummyUnits });
+          setError("API Connection Failed.",err);
         }
-      }
+      
     };
     loadData();
   }, []);
@@ -147,8 +139,6 @@ const MaterialsEntryPage = () => {
       <div className="form-wrapper">
         <div className="header">
           <h2>Materials Purchased Entry</h2>
-          {USE_DUMMY_DATA && <span style={{fontSize:'12px', color:'red'}}>(Dev Mode: Dummy Data)</span>}
-          {error && <span style={{fontSize:'12px', color:'orange', display:'block'}}>{error}</span>}
         </div>
 
         <form onSubmit={handleSubmit}>
