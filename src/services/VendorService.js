@@ -9,6 +9,22 @@ const BASE_URL = process.env.BASE_URL;
  * @param {string} toDate - End date in YYYY-MM-DD format
  * @returns {Promise<Array>} - The list of report items
  */
+
+
+export const fetchVendorList = async () => {
+  try {
+    const response = await fetch(`${BASE_URL}/getVendors`);
+    if (!response.ok) {
+      throw new Error("Failed to fetch vendors");
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching vendor list:", error);
+    throw error;
+  }
+};
+
+
 export const fetchVendorReportData = async (vendorName, fromDate, toDate) => {
   const url = `${BASE_URL}/report/controller/getPurchaseDetails`;
 

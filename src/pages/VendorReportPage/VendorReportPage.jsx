@@ -1,21 +1,63 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom'; // <--- 1. Import useLocation
+import { useLocation } from 'react-router-dom';
 import './VendorReportPage.css';
-import { fetchVendorReportData } from '../../services/VendorService'; 
+// Ensure fetchVendorList is exported from your service file
+import { fetchVendorReportData, fetchVendorList } from '../../services/VendorService'; 
 
 const VendorReportPage = () => {
-  const location = useLocation(); // <--- 2. Initialize location hook
+  const location = useLocation();
 
   // --- STATE ---
   const [formData, setFormData] = useState({
-    vendorName: 'XYZ Enterprises',
+    vendorName: '', // Start empty, will populate after fetch
     fromDate: '2018-02-09',
     toDate: '2018-07-08'
   });
 
+  const [vendorOptions, setVendorOptions] = useState([]); // Stores the full list of vendors from API
   const [reportData, setReportData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  // Helper to find the full vendor object based on the currently selected name
+  const selectedVendorDetails = vendorOptions.find(v => v.vendorName === formData.vendorName) || {};
+
+  // --- 1. FETCH VENDOR LIST ON MOUNT ---
+  useEffect(() => {
+    const loadVendors = async () => {
+      try {
+        const vendors = await fetchVendorList();
+        setVendorOptions(vendors);
+        
+        // If we have vendors and no name is selected yet, select the first one by default
+        if (vendors.length > 0 && !formData.vendorName) {
+           setFormData(prev => ({ ...prev, vendorName: vendors[0].vendorName }));
+        }
+      } catch (err) {
+        console.error("Failed to load vendor list:", err);
+        setError("Could not load vendor list.");
+      }
+    };
+    loadVendors();
+  }, []);
+
+  // --- 2. HANDLE REDIRECT FROM ENTRY PAGE ---
+  useEffect(() => {
+    if (location.state) {
+      const { vendorName, fromDate, toDate } = location.state;
+      console.log("Redirected with state:", location.state);
+
+      setFormData({
+        vendorName: vendorName || '',
+        fromDate: fromDate || '',
+        toDate: toDate || ''
+      });
+
+      if (vendorName && fromDate && toDate) {
+        loadReportData(vendorName, fromDate, toDate);
+      }
+    }
+  }, [location.state]);
 
   // --- HANDLERS ---
   const handleInputChange = (e) => {
@@ -29,8 +71,6 @@ const VendorReportPage = () => {
     return date.toLocaleDateString('en-GB').replace(/\//g, '-');
   };
 
-  // --- REUSABLE FETCH LOGIC ---
-  // Extracted this so we can call it from Button Click AND from useEffect
   const loadReportData = async (vName, fDate, tDate) => {
     setIsLoading(true);
     setError(null);
@@ -43,45 +83,21 @@ const VendorReportPage = () => {
         setReportData([]); 
       }
     } catch (err) {
-      setError("Failed to fetch data from server.",err);
+      console.error(err);
+      setError("Failed to fetch data from server.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  // --- EVENT: Manual Form Submit ---
   const handleSearch = (e) => {
     e.preventDefault();
     loadReportData(formData.vendorName, formData.fromDate, formData.toDate);
   };
 
-  // --- EVENT: On Page Load (Check for redirected data) ---
-  useEffect(() => {
-    // If data was passed via navigate(), use it!
-    if (location.state) {
-      const { vendorName, fromDate, toDate } = location.state;
-
-      console.log("Redirected with state:", location.state);
-
-      // 1. Update the Filter Form UI
-      setFormData({
-        vendorName: vendorName || '',
-        fromDate: fromDate || '',
-        toDate: toDate || ''
-      });
-
-      // 2. Trigger API Call automatically
-      // We pass values directly because setFormData is async and might not be done yet
-      if (vendorName && fromDate && toDate) {
-        loadReportData(vendorName, fromDate, toDate);
-      }
-    }
-  }, [location.state]); // Only run if location state changes
-
   return (
     <div className="report-container">
       
-      {/* HEADER */}
       <div className="page-header">
         <h2 className="page-title">Vendor purchase report</h2>
         <p className="description-text">
@@ -95,15 +111,19 @@ const VendorReportPage = () => {
         
         <div className="form-group">
           <label>Vendor Name</label>
+          {/* DYNAMIC DROPDOWN */}
           <select 
             name="vendorName" 
             className="form-control" 
             value={formData.vendorName}
             onChange={handleInputChange}
           >
-            <option value="XYZ Enterprises">XYZ Enterprises</option>
-            <option value="Only Vimal">Only Vimal</option>
-            <option value="Brand A">Brand A</option>
+            <option value="">-- Select Vendor --</option>
+            {vendorOptions.map((vendor) => (
+              <option key={vendor.vendorId} value={vendor.vendorName}>
+                {vendor.vendorName}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -134,19 +154,18 @@ const VendorReportPage = () => {
         </button>
       </form>
 
-      {/* ERROR MESSAGE */}
       {error && <div className="error-msg">{error}</div>}
 
-      {/* VENDOR DETAILS */}
+      {/* DYNAMIC VENDOR DETAILS */}
       <div className="vendor-details">
         <div className="detail-item">
-          <strong>Address:</strong> Stock home road, Sector 22, New Delhi, 110001
+          <strong>Address:</strong> {selectedVendorDetails.vendorAddress || "N/A"}
         </div>
         <div className="detail-item">
-          <strong>Contact Number:</strong> 9005600744
+          <strong>Contact Number:</strong> {selectedVendorDetails.contactNumber || "N/A"}
         </div>
         <div className="detail-item">
-          <strong>Contact person:</strong> Elizabeth
+          <strong>Contact person:</strong> {selectedVendorDetails.contactPerson || "N/A"}
         </div>
       </div>
 
@@ -204,4 +223,4 @@ const VendorReportPage = () => {
   );
 };
 
-export default VendorReportPage;    
+export default VendorReportPage;

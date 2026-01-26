@@ -84,26 +84,9 @@ const MaterialsEntryPage = () => {
     }));
   };
 
-  const generatePurchaseId = () => {
-    const selectedVendor = vendorOptions.find(v => v.vendorName === formData.vendorName);
-    const vCode = selectedVendor ? selectedVendor.vendorId : 'UNK';
-    
-    let dateStr = '00000000';
-    if(formData.purchaseDate) {
-      const [year, month, day] = formData.purchaseDate.split('-');
-      dateStr = `${month}${day}${year}`; 
-    }
-
-    // FIX: Use the ID we now have in state (or XXX if missing)
-    const cCode = formData.materialCategoryId || 'XXX';
-
-    return `P_${vCode}_${dateStr}_${cCode}_1`;
-  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const newId = generatePurchaseId();
-    setGeneratedId(newId);
     
     // FIX: Clean up payload creation
     const payload = { 
@@ -117,7 +100,8 @@ const MaterialsEntryPage = () => {
     savePurchaseEntry(payload)
       .then((response) => {
         console.log("Server Response:", response);
-        alert(`Success! Entry saved with ID: ${newId}`);
+        alert(`Success! Entry saved with ID: ${response.transactionId}`);
+        setGeneratedId(response.transactionId);
         
         // FIX: Only navigate if API call is successful
         navigate('/vendorReport', { 
