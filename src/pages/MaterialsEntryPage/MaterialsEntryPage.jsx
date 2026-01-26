@@ -1,58 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'; // <--- 1. Import useNavigate
+import { useNavigate } from 'react-router-dom';
 import './MaterialsEntryPage.css'; 
 import { dummyCategories, dummyTypes, dummyVendors, dummyUnits } from '../../dummyData/MaterialPageDummy';
-import { fetchAllMaterialFormData,savePurchaseEntry } from '../../services/MaterialService';
+import { fetchAllMaterialFormData, savePurchaseEntry } from '../../services/MaterialService';
 
 const USE_DUMMY_DATA = false;
 
 const MaterialsEntryPage = () => {
-  const navigate = useNavigate(); // <--- 2. Initialize Hook
+  const navigate = useNavigate();
 
   // --- State for Form Fields ---
-  // const [formData, setFormData] = useState({
-  //   vendorName: '',
-  //   materialCategory: '',
-  //   materialType: '',
-  //   unit: '',
-  //   brandName: '',
-  //   quantity: '',
-  //   purchaseAmount: '',
-  //   purchaseDate: ''
-  // });
   const [formData, setFormData] = useState({
     vendorName: '',
-    materialCategoryId:'',
-    materialTypeId:'',
+    materialCategoryId: '', // These IDs will now be populated automatically
+    materialTypeId: '',
     brandName: '',
-    unitId:'',
+    unitId: '',
     quantity: '',
     purchaseAmount: '',
     purchaseDate: '',
     materialCategoryName: '',
     materialTypeName: '',
-    MaterialUnitName: '',
+    MaterialUnitName: '', // Note: Keeping casing as per your request
+    balance: 0.0,         // Added balance (often required by backend)
+    status: 'Pending'     // Added status (optional)
   });
-/*
-private long purchaseId;
-  private String transactionId;
-  private String vendorName;
-  private String materialCategoryId;
-  private String materialTypeId;
-  private String brandName;
-  private String unitId;
-  private Integer quantity;
-  private Double purchaseAmount;
-  private Double balance;
-  private Date purchaseDate;
-  private String materialCategoryName;
-  private String materialTypeName;
-  private String materialUnitName;
-  private String status;
-*/
-  const [generatedId, setGeneratedId] = useState('');
 
-  // --- State for Data (Dropdowns) ---
+  const [generatedId, setGeneratedId] = useState('');
   const [vendorOptions, setVendorOptions] = useState([]);
   const [materialData, setMaterialData] = useState({
     categories: [],
@@ -72,7 +46,8 @@ private long purchaseId;
       } else {
         try {
           const data = await fetchAllMaterialFormData();
-          console.log(data);
+          // FIX: Removed direct state mutation (formData.unitId = ...). 
+          // We only set the dropdown options here. The IDs are set when user selects an option.
           setVendorOptions(data.vendors);
           setMaterialData({ categories: data.categories, types: data.types, units: data.units });
         } catch (err) {
@@ -85,10 +60,36 @@ private long purchaseId;
     loadData();
   }, []);
 
-  // --- Handlers ---
+  // --- FIX: Smart Handle Change ---
+  // This function now updates the Name AND finds the matching ID
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    let extraUpdates = {};
+
+    // 1. If Category Name changes, find and set Category ID
+    if (name === 'materialCategoryName') {
+        const selectedCat = materialData.categories.find(c => c.categoryName === value);
+        extraUpdates.materialCategoryId = selectedCat ? selectedCat.categoryId : '';
+    }
+
+    // 2. If Type Name changes, find and set Type ID
+    if (name === 'materialTypeName') {
+        const selectedType = materialData.types.find(t => t.typeName === value);
+        extraUpdates.materialTypeId = selectedType ? selectedType.typeId : '';
+    }
+
+    // 3. If Unit Name changes, find and set Unit ID
+    if (name === 'MaterialUnitName') {
+        const selectedUnit = materialData.units.find(u => u.unitName === value);
+        extraUpdates.unitId = selectedUnit ? selectedUnit.unitId : '';
+    }
+
+    // Update state with Name AND the found ID
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+      ...extraUpdates
+    }));
   };
 
   const generatePurchaseId = () => {
@@ -101,8 +102,8 @@ private long purchaseId;
       dateStr = `${month}${day}${year}`; 
     }
 
-    const selectedCat = materialData.categories.find(c => c.categoryName === formData.materialCategory);
-    const cCode = selectedCat ? selectedCat.categoryId : 'XXX';
+    // FIX: Use the ID we now have in state (or XXX if missing)
+    const cCode = formData.materialCategoryId || 'XXX';
 
     return `P_${vCode}_${dateStr}_${cCode}_1`;
   };
@@ -112,23 +113,34 @@ private long purchaseId;
     const newId = generatePurchaseId();
     setGeneratedId(newId);
     
-    const payload = { ...formData, purchaseId: newId };
+    // FIX: Clean up payload creation
+    const payload = { 
+        ...formData, 
+        purchaseId: newId,
+        balance: formData.purchaseAmount // Assuming balance = purchaseAmount initially
+    };
+    
     console.log("Submitting Payload:", payload);
-       savePurchaseEntry(payload)
-      .then(console.log)
-      .catch(console.error);
+    
+    // FIX: Proper Promise chain
+    savePurchaseEntry(payload)
+      .then((response) => {
+        console.log("Server Response:", response);
         alert(`Success! Entry saved with ID: ${newId}`);
-    alert("Form Submitted! Redirecting to Report...");
-
-    // <--- 3. NAVIGATE TO REPORT PAGE WITH DATA --->
-    // We pass the vendorName and use the purchaseDate for both 'from' and 'to'
-    navigate('/vendorReport', { 
-      state: { 
-        vendorName: formData.vendorName,
-        fromDate: formData.purchaseDate,
-        toDate: formData.purchaseDate // Setting range to the specific purchase date
-      } 
-    });
+        
+        // FIX: Only navigate if API call is successful
+        navigate('/vendorReport', { 
+            state: { 
+              vendorName: formData.vendorName,
+              fromDate: formData.purchaseDate,
+              toDate: formData.purchaseDate 
+            } 
+        });
+      })
+      .catch((err) => {
+        console.error("Save Error:", err);
+        alert("Failed to save data. Please check console.");
+      });
   };
 
   return (
@@ -155,6 +167,7 @@ private long purchaseId;
           {/* Material Category */}
           <div className="form-group">
             <label>Material Category</label>
+            {/* FIX: name must match state key 'materialCategoryName' */}
             <select name="materialCategoryName" value={formData.materialCategoryName} onChange={handleChange} required>
               <option value="">-- Select Category --</option>
               {materialData.categories.map((c) => (
