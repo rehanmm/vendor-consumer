@@ -1,6 +1,6 @@
 // services/VendorService.js
 
-const BASE_URL = process.env.BASE_URL;
+const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 /**
  * Fetches the vendor purchase report.
@@ -13,6 +13,7 @@ const BASE_URL = process.env.BASE_URL;
 
 export const fetchVendorList = async () => {
   try {
+    console.log(BASE_URL);
     const response = await fetch(`${BASE_URL}/getVendors`);
     if (!response.ok) {
       throw new Error("Failed to fetch vendors");

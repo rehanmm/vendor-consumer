@@ -1,7 +1,7 @@
 // services/MaterialService.js
 
 // Based on your code, Vendors are on port 8088, others on 8087
-const BASE_URL = process.env.BASE_URL;
+const BASE_URL = process.env.REACT_APP_BASE_URL;
 /**
  * Generic helper to fetch JSON data
  */
