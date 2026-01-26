@@ -1,6 +1,14 @@
-
 import React, { useState, useEffect } from 'react';
-import './MaterialsEntryPage.css'; // Assuming you save the CSS below in this file
+import './MaterialsEntryPage.css'; 
+import { dummyCategories, dummyTypes, dummyVendors, dummyUnits } from '../../dummyData/MaterialPageDummy';
+// Import the service
+import { fetchAllMaterialFormData } from '../../services/MaterialService';
+
+// ==========================================
+// 1. CONFIGURATION: TOGGLE DATA SOURCE HERE
+// ==========================================
+const USE_DUMMY_DATA = true; // Set to FALSE to use real API calls
+// ==========================================
 
 const MaterialsEntryPage = () => {
   // --- State for Form Fields ---
@@ -17,7 +25,7 @@ const MaterialsEntryPage = () => {
 
   const [generatedId, setGeneratedId] = useState('');
 
-  // --- State for "Microservice" Data ---
+  // --- State for Data (Dropdowns) ---
   const [vendorOptions, setVendorOptions] = useState([]);
   const [materialData, setMaterialData] = useState({
     categories: [],
@@ -25,34 +33,47 @@ const MaterialsEntryPage = () => {
     units: []
   });
 
-  // --- Simulate Microservice Calls ---
+  const [error, setError] = useState(null);
+
+  // --- EFFECT: Fetch Data (Dummy or Real) ---
   useEffect(() => {
-    // Simulating Vendor Application Microservice
-    const fetchVendorData = () => {
-      const dummyVendors = [
-        { id: 'v1', name: 'XYZ Enterprises', code: 'XYZ' },
-        { id: 'v2', name: 'ABC Supply Co', code: 'ABC' },
-        { id: 'v3', name: 'Global Textiles', code: 'GLO' }
-      ];
-      setVendorOptions(dummyVendors);
+    const loadData = async () => {
+      setError(null);
+
+      if (USE_DUMMY_DATA) {
+        console.log("Loading Dummy Data...");
+        setVendorOptions(dummyVendors);
+        setMaterialData({
+          categories: dummyCategories,
+          types: dummyTypes,
+          units: dummyUnits
+        });
+      } else {
+        console.log("Attempting API Calls...");
+        try {
+          // Use the service to fetch everything in parallel
+          const data = await fetchAllMaterialFormData();
+          
+          setVendorOptions(data.vendors);
+          setMaterialData({
+            categories: data.categories,
+            types: data.types,
+            units: data.units
+          });
+        } catch (err) {
+          setError("API Connection Failed. Using Dummy Data as fallback.");
+          // Fallback mechanism (optional)
+          setVendorOptions(dummyVendors);
+          setMaterialData({
+             categories: dummyCategories,
+             types: dummyTypes,
+             units: dummyUnits
+          });
+        }
+      }
     };
 
-    // Simulating Material Application Microservice
-    const fetchMaterialData = () => {
-      const dummyMaterials = {
-        categories: [
-          { name: 'Cloth', code: 'CLO' },
-          { name: 'Steel', code: 'STL' },
-          { name: 'Wood', code: 'WOD' }
-        ],
-        types: ['Linen', 'Cotton', 'Silk', 'Polyester'],
-        units: ['Metre', 'Kilogram', 'Liter', 'Square Foot']
-      };
-      setMaterialData(dummyMaterials);
-    };
-
-    fetchVendorData();
-    fetchMaterialData();
+    loadData();
   }, []);
 
   // --- Handlers ---
@@ -65,25 +86,22 @@ const MaterialsEntryPage = () => {
   };
 
   const generatePurchaseId = () => {
-    // Logic: P_XYZ_07052018_CLO_1
-    // Format: P_{VendorCode}_{DateDDMMYYYY}_{CategoryCode}_1
+    // Logic: P_{VendorId}_{Date}_{CategoryId}_1
     
-    // 1. Get Vendor Code
-    const selectedVendor = vendorOptions.find(v => v.name === formData.vendorName);
-    const vCode = selectedVendor ? selectedVendor.code : 'UNK';
+    // 1. Get Vendor ID safely
+    const selectedVendor = vendorOptions.find(v => v.vendorName === formData.vendorName);
+    const vCode = selectedVendor ? selectedVendor.vendorId : 'UNK';
 
-    // 2. Format Date (YYYY-MM-DD -> DDMMYYYY)
+    // 2. Format Date
     let dateStr = '00000000';
     if(formData.purchaseDate) {
       const [year, month, day] = formData.purchaseDate.split('-');
       dateStr = `${month}${day}${year}`; 
-      // Note: The example image uses 0705 (July 5th) for Month/Day order based on standard US/ISO mix, 
-      // but usually DDMMYYYY is preferred in enterprise. I will match the image example: MonthDayYear.
     }
 
-    // 3. Get Category Code
-    const selectedCat = materialData.categories.find(c => c.name === formData.materialCategory);
-    const cCode = selectedCat ? selectedCat.code : 'XXX';
+    // 3. Get Category ID safely
+    const selectedCat = materialData.categories.find(c => c.categoryName === formData.materialCategory);
+    const cCode = selectedCat ? selectedCat.categoryId : 'XXX';
 
     return `P_${vCode}_${dateStr}_${cCode}_1`;
   };
@@ -92,19 +110,28 @@ const MaterialsEntryPage = () => {
     e.preventDefault();
     const newId = generatePurchaseId();
     setGeneratedId(newId);
+    
+    // Create the final payload object
+    const payload = { ...formData, purchaseId: newId };
+    
+    console.log("Submitting Payload:", payload);
     alert(`Form Submitted!\nGenerated Purchase ID: ${newId}`);
+    
+    // Here you would typically call another service function to POST the data:
+    // await saveMaterialEntry(payload);
   };
 
   return (
     <div className="container">
       <div className="form-wrapper">
-        {/* Header */}
         <div className="header">
           <h2>Materials Purchased Entry</h2>
+          {USE_DUMMY_DATA && <span style={{fontSize:'12px', color:'red'}}>(Dev Mode: Dummy Data)</span>}
+          {error && <span style={{fontSize:'12px', color:'orange', display:'block'}}>{error}</span>}
         </div>
 
         <form onSubmit={handleSubmit}>
-          {/* Vendor Name - From Vendor Microservice */}
+          {/* Vendor Name */}
           <div className="form-group">
             <label>Vendor Name</label>
             <select 
@@ -115,12 +142,12 @@ const MaterialsEntryPage = () => {
             >
               <option value="">-- Select Vendor --</option>
               {vendorOptions.map((v) => (
-                <option key={v.id} value={v.name}>{v.name}</option>
+                <option key={v.vendorId} value={v.vendorName}>{v.vendorName}</option>
               ))}
             </select>
           </div>
 
-          {/* Material Category - From Material Microservice */}
+          {/* Material Category */}
           <div className="form-group">
             <label>Material Category</label>
             <select 
@@ -130,13 +157,13 @@ const MaterialsEntryPage = () => {
               required
             >
               <option value="">-- Select Category --</option>
-              {materialData.categories.map((c, index) => (
-                <option key={index} value={c.name}>{c.name}</option>
+              {materialData.categories.map((c) => (
+                <option key={c.categoryId} value={c.categoryName}>{c.categoryName}</option>
               ))}
             </select>
           </div>
 
-          {/* Material Type - From Material Microservice */}
+          {/* Material Type */}
           <div className="form-group">
             <label>Material Type</label>
             <select 
@@ -145,13 +172,13 @@ const MaterialsEntryPage = () => {
               onChange={handleChange}
             >
               <option value="">-- Select Type --</option>
-              {materialData.types.map((t, index) => (
-                <option key={index} value={t}>{t}</option>
+              {materialData.types.map((t) => (
+                <option key={t.typeId} value={t.typeName}>{t.typeName}</option>
               ))}
             </select>
           </div>
 
-          {/* Unit - From Material Microservice */}
+          {/* Unit */}
           <div className="form-group">
             <label>Unit</label>
             <select 
@@ -160,8 +187,8 @@ const MaterialsEntryPage = () => {
               onChange={handleChange}
             >
               <option value="">-- Select Unit --</option>
-              {materialData.units.map((u, index) => (
-                <option key={index} value={u}>{u}</option>
+              {materialData.units.map((u) => (
+                <option key={u.unitId} value={u.unitName}>{u.unitName}</option>
               ))}
             </select>
           </div>
@@ -217,11 +244,10 @@ const MaterialsEntryPage = () => {
           </div>
         </form>
 
-        {/* Footer Note */}
         <div className="footer-note">
           <p>
             Note: <i>Purchase Id is generated on submit Ex: 
-            {generatedId ? <strong> {generatedId}</strong> : " P_XYZ_07052018_CLO_1"}</i>
+            {generatedId ? <strong> {generatedId}</strong> : " P_V001_07052018_C001_1"}</i>
           </p>
         </div>
       </div>

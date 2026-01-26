@@ -68,7 +68,7 @@
   /* Submit Button */
   .form-actions {
     display: flex;
-    justify-content: flex-start; /* Image shows button aligned near left/center */
+    justify-content: center;
     margin-top: 20px;
   }
   

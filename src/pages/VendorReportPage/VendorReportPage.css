@@ -1,0 +1,151 @@
+/* General Layout */
+.report-container {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 20px;
+  color: #333;
+  background-color: #f9f9f9;
+  min-height: 100vh;
+}
+
+/* Page Header */
+.page-header {
+  background-color: #e6e6fa; /* Light purple background */
+  padding: 10px 15px;
+  border-bottom: 1px solid #ccc;
+  margin-bottom: 20px;
+}
+
+.page-title {
+  color: #4b3b6b; /* Dark purple text */
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.description-text {
+  font-size: 0.9rem;
+  color: #666;
+  margin-top: 5px;
+}
+
+/* Filter Section */
+.filter-section {
+  background-color: #dcd6e8; /* Matches the filter bar color */
+  padding: 15px;
+  border: 1px solid #bdaec1;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.filter-header {
+  font-weight: bold;
+  color: #4b3b6b;
+  margin-bottom: 0;
+  margin-right: 10px;
+}
+
+.form-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.form-group label {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.form-control {
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+}
+
+.btn-search {
+  background-color: #a89bc4;
+  color: #2e2245;
+  border: 1px solid #887a9c;
+  padding: 5px 20px;
+  cursor: pointer;
+  font-weight: bold;
+  border-radius: 3px;
+}
+
+.btn-search:hover {
+  background-color: #9686b5;
+}
+
+/* Vendor Details Box */
+.vendor-details {
+  background-color: #e8e8e8;
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.detail-item strong {
+  margin-right: 5px;
+  color: #444;
+}
+
+/* Table Styling */
+.table-wrapper {
+  overflow-x: auto;
+  border: 1px solid #ddd;
+}
+
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.report-table thead {
+  background-color: #9d8db5; /* Dark purple header */
+  color: white;
+}
+
+.report-table th {
+  padding: 10px;
+  text-align: left;
+  font-weight: normal;
+  border-right: 1px solid #bdaec1;
+}
+
+.report-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Specific styling for the first column (Material Category) */
+.category-col {
+  background-color: #dcd6e8; /* Light purple column background */
+  font-weight: 600;
+  color: #333;
+}
+
+.report-table tr:nth-child(even) {
+  background-color: #f4f4f4;
+}
+
+/* Footer */
+.footer {
+  text-align: right;
+  font-size: 0.75rem;
+  color: #777;
+  margin-top: 10px;
+  padding-bottom: 20px;
+}
+
+.error-msg {
+  color: red;
+  padding: 10px;
+  background-color: #ffe6e6;
+  border: 1px solid red;
+  margin-bottom: 10px;
+}
