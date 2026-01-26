@@ -21,7 +21,7 @@ export const fetchVendorReportData = async (vendorName, fromDate, toDate) => {
 
   try {
     const response = await fetch(url, {
-      method: 'POST',
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
