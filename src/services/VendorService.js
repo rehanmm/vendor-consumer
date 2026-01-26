@@ -10,7 +10,7 @@ const API_BASE_URL = "http://localhost:8080/inventorymanagementsystem";
  * @returns {Promise<Array>} - The list of report items
  */
 export const fetchVendorReportData = async (vendorName, fromDate, toDate) => {
-  const url = `${API_BASE_URL}/report/controller`;
+  const url = `${API_BASE_URL}/report/controller/getPurchaseDetails`;
 
   // Construct the payload exactly as the API expects
   const payload = {
