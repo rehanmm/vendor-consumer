@@ -1,0 +1,101 @@
+.home-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #f4f4f9;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+}
+
+.home-header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.home-header h1 {
+  font-size: 2.5rem;
+  color: #2e2245; /* Dark Purple */
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  color: #666;
+  font-size: 1.1rem;
+}
+
+/* Grid Layout */
+.card-grid {
+  display: flex;
+  gap: 30px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* Navigation Card Styling */
+.nav-card {
+  background: white;
+  width: 300px;
+  padding: 30px;
+  border-radius: 12px;
+  text-decoration: none;
+  color: inherit;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  border-top: 5px solid #2e2245;
+}
+
+.nav-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(46, 34, 69, 0.2);
+}
+
+.icon-wrapper {
+  font-size: 3rem;
+  margin-bottom: 15px;
+  background-color: #f0ebf8;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.nav-card h2 {
+  color: #2e2245;
+  margin: 10px 0;
+}
+
+.nav-card p {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 25px;
+  line-height: 1.4;
+}
+
+.btn-fake {
+  margin-top: auto;
+  background-color: #2e2245;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 0.9rem;
+  transition: background 0.2s;
+}
+
+.nav-card:hover .btn-fake {
+  background-color: #4b3b6b;
+}
+
+.home-footer {
+  margin-top: 60px;
+  color: #999;
+  font-size: 0.8rem;
+}

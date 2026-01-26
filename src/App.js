@@ -4,6 +4,7 @@ import './App.css';
 import { MaterialEntryPage, VendorReportPage } from './pages'; 
 // 1. Import BrowserRouter
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import HomePage from './pages/HomePage/HomePage';
 
 
 function App() {
@@ -16,7 +17,7 @@ function App() {
           <Route path="/vendorReport" element={<VendorReportPage />} />
           
           {/* Default path redirects to Material Entry */}
-          <Route path="/" element={<MaterialEntryPage />} />
+          <Route path="/" element={<HomePage/>} />
         </Routes>
       </div>
     </Router>
