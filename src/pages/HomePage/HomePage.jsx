@@ -5,36 +5,22 @@ import './HomePage.css';
 const HomePage = () => {
   return (
     <div className="home-container">
-      <header className="home-header">
-        <h1>Inventory Management System</h1>
-        <p className="subtitle">Select a module to continue</p>
-      </header>
-
-      <div className="card-grid">
-        {/* Card 1: Material Entry */}
-        <Link to="/materialPage" className="nav-card">
-          <div className="icon-wrapper">
-            <span role="img" aria-label="entry">📝</span>
-          </div>
-          <h2>Material Entry</h2>
-          <p>Record new purchase entries, select vendors, and generate purchase IDs.</p>
-          <div className="btn-fake">Go to Entry</div>
-        </Link>
-
-        {/* Card 2: Vendor Report */}
-        <Link to="/vendorReport" className="nav-card">
-          <div className="icon-wrapper">
-            <span role="img" aria-label="report">📊</span>
-          </div>
-          <h2>Vendor Report</h2>
-          <p>View detailed purchase history, filter by dates, and analyze costs.</p>
-          <div className="btn-fake">View Reports</div>
-        </Link>
+      <div className="content-area">
+        <h1 className="main-title">Problem Statement</h1>
+        
+        <div className="text-block">
+          <p>
+            <strong>ABC</strong>, a company needs a software to manage their inventory 
+            purchased from vendors and maintains their payment due history. 
+            The application helps to generate reports on:
+          </p>
+          <ul>
+            <li>Vendor purchased items and balances.</li>
+            <li>Material categories and unit tracking.</li>
+            <li>Date-wise purchase history.</li>
+          </ul>
+        </div>
       </div>
-
-      <footer className="home-footer">
-        &copy; 2024 Inventory System
-      </footer>
     </div>
   );
 };
