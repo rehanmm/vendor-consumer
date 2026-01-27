@@ -27,17 +27,13 @@ const Navbar = () => {
         </li>
 
         {/* REPORT TAB */}
-        <li 
-          className="nav-item dropdown-container"
-        >
-          <span className="nav-link non-clickable">
+        <li className="nav-item">
+          <NavLink to="/vendorReport" className="nav-link">
             Report
-          </span>
-          
-          {/* Tooltip always renders now */}
+          </NavLink>
           <div className="tooltip">View Vendor Analytics</div>
-
         </li>
+       
 
       </ul>
     </nav>
