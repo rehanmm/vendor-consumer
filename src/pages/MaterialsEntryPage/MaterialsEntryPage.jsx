@@ -100,6 +100,7 @@ const MaterialsEntryPage = () => {
     savePurchaseEntry(payload)
       .then((response) => {
         console.log("Server Response:", response);
+        response=JSON.parse(response);
         alert(`Success! Entry saved with ID: ${response.transactionId}`);
         setGeneratedId(response.transactionId);
         
