@@ -20,6 +20,8 @@ const HomePage = () => {
             <li>Date-wise purchase history.</li>
           </ul>
         </div>
+
+        {/* Add a button or link for further action */}
       </div>
     </div>
   );
