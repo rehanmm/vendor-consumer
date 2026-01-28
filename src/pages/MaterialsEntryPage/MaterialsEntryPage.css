@@ -95,3 +95,47 @@
   .footer-note i {
     font-style: italic;
   }
+
+  /* Container must be relative so the popup sits near it */
+.form-group {
+  position: relative; 
+}
+
+/* Red Border for invalid inputs */
+.input-error {
+  border: 1px solid #d32f2f !important;
+  background-color: #fff0f0;
+}
+
+/* The Pop-up Card Style */
+.error-popup {
+  position: absolute;
+  bottom: 100%;       /* Sit on top of the input */
+  right: 0;           /* Align to right */
+  background-color: #fff;
+  color: #d32f2f;
+  border: 1px solid #d32f2f;
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-size: 12px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.15); /* Drop shadow effect */
+  white-space: nowrap;
+  z-index: 10;
+  animation: popIn 0.3s ease-out;
+}
+
+/* Little triangle arrow pointing down */
+.error-popup::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  right: 15px;
+  border-width: 6px;
+  border-style: solid;
+  border-color: #d32f2f transparent transparent transparent;
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}

@@ -33,6 +33,7 @@ const MaterialsEntryPage = () => {
   });
 
   const [error, setError] = useState(null);
+  const [formErrors, setFormErrors] = useState({});
 
   // --- EFFECT: Fetch Data ---
   useEffect(() => {
@@ -52,12 +53,37 @@ const MaterialsEntryPage = () => {
     loadData();
   }, []);
 
+
+  // ADD THIS NEW FUNCTION
+  const validateForm = () => {
+    const errors = {};
+    let isValid = true;
+
+    // Rule 1: Quantity must be digits only
+    const quantityRegex = /^\d+$/;
+    if (!formData.quantity || !quantityRegex.test(formData.quantity)) {
+      errors.quantity = "Please enter only numbers for Quantity.";
+      isValid = false;
+    }
+
+    // Rule 2: Purchase Amount must be number with max 2 decimals
+    const amountRegex = /^\d+(\.\d{1,2})?$/;
+    if (!formData.purchaseAmount || !amountRegex.test(formData.purchaseAmount)) {
+      errors.purchaseAmount = "Please enter only numbers with two decimal places.";
+      isValid = false;
+    }
+
+    setFormErrors(errors);
+    return isValid;
+  };
   // --- FIX: Smart Handle Change ---
   // This function now updates the Name AND finds the matching ID
   const handleChange = (e) => {
     const { name, value } = e.target;
     let extraUpdates = {};
-
+    if (formErrors[name]) {
+      setFormErrors(prev => ({ ...prev, [name]: '' }));
+    }
     // 1. If Category Name changes, find and set Category ID
     if (name === 'materialCategoryName') {
         const selectedCat = materialData.categories.find(c => c.categoryName === value);
@@ -87,7 +113,10 @@ const MaterialsEntryPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+    // ADD THIS BLOCK: Stop if validation fails
+    if (!validateForm()) {
+      return; 
+    }
     // FIX: Clean up payload creation
     const payload = { 
         ...formData, 
@@ -178,16 +207,42 @@ const MaterialsEntryPage = () => {
             <input type="text" name="brandName" value={formData.brandName} onChange={handleChange} placeholder="e.g. Raymonds"/>
           </div>
 
-          {/* Quantity */}
-          <div className="form-group">
+         {/* Quantity Field */}
+         <div className="form-group">
             <label>Quantity</label>
-            <input type="number" name="quantity" value={formData.quantity} onChange={handleChange} />
+            <input 
+              type="text" 
+              name="quantity" 
+              value={formData.quantity} 
+              onChange={handleChange} 
+              className={formErrors.quantity ? 'input-error' : ''}
+              placeholder="Enter numbers only"
+            />
+            {/* Pop-up Card Logic */}
+            {formErrors.quantity && (
+              <div className="error-popup">
+                ⚠ {formErrors.quantity}
+              </div>
+            )}
           </div>
 
-          {/* Purchase Amount */}
+          {/* Purchase Amount Field */}
           <div className="form-group">
             <label>Purchase Amount</label>
-            <input type="number" name="purchaseAmount" value={formData.purchaseAmount} onChange={handleChange} />
+            <input 
+              type="text" 
+              name="purchaseAmount" 
+              value={formData.purchaseAmount} 
+              onChange={handleChange} 
+              className={formErrors.purchaseAmount ? 'input-error' : ''}
+              placeholder="e.g. 1000.50"
+            />
+            {/* Pop-up Card Logic */}
+            {formErrors.purchaseAmount && (
+              <div className="error-popup">
+                ⚠ {formErrors.purchaseAmount}
+              </div>
+            )}
           </div>
 
           {/* Purchase Date */}
