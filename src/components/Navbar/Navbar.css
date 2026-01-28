@@ -10,6 +10,7 @@ background-color: #333;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     /* Ensure tooltips aren't clipped */
     overflow: visible; 
+    z-index: 10;
   }
   
   .nav-menu {

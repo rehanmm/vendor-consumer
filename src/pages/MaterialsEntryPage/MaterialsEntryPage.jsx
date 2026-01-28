@@ -59,6 +59,10 @@ const MaterialsEntryPage = () => {
     const errors = {};
     let isValid = true;
 
+    if (!formData.brandName || formData.brandName.trim() === "") {
+      errors.brandName = "Brand Name cannot be empty.";
+      isValid = false;
+    }
     // Rule 1: Quantity must be digits only
     const quantityRegex = /^\d+$/;
     if (!formData.quantity || !quantityRegex.test(formData.quantity)) {
@@ -201,10 +205,24 @@ const MaterialsEntryPage = () => {
             </select>
           </div>
 
-          {/* Brand Name */}
+          {/* Brand Name Field */}
           <div className="form-group">
             <label>Brand Name</label>
-            <input type="text" name="brandName" value={formData.brandName} onChange={handleChange} placeholder="e.g. Raymonds"/>
+            <input 
+              type="text" 
+              name="brandName" 
+              value={formData.brandName} 
+              onChange={handleChange} 
+              className={formErrors.brandName ? 'input-error' : ''} // Red border on error
+              placeholder="e.g. Raymonds"
+            />
+            
+            {/* Pop-up Error Card */}
+            {formErrors.brandName && (
+              <div className="error-popup">
+                ⚠ {formErrors.brandName}
+              </div>
+            )}
           </div>
 
          {/* Quantity Field */}
@@ -257,7 +275,7 @@ const MaterialsEntryPage = () => {
         </form>
 
         <div className="footer-note">
-           <p>Note: <i>Purchase Id is generated on submit</i></p>
+           <p>Note: <i>Purchase Id will be generated on submit</i></p>
         </div>
       </div>
     </div>
